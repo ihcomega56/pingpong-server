@@ -1,7 +1,7 @@
 pipeline {
   agent any
   stages {
-    stage('Git clone') {
+    stage('Gitクローン') {
       steps {
         git branch: 'master',
           credentialsId: 'github',
@@ -9,7 +9,7 @@ pipeline {
       }
     }
 
-    stage('Build') {
+    stage('ビルド, テスト, アーティファクトのプッシュ') {
 
       steps {
         rtGradleResolver(
@@ -29,7 +29,7 @@ pipeline {
         rtGradleRun(
           useWrapper: true,
           buildFile: 'build.gradle',
-          tasks: 'clean artifactoryPublish',
+          tasks: 'clean test artifactoryPublish',
           resolverId: 'pingpong-resolver',
           deployerId: 'pingpong-deployer',
           // If the build name and build number are not set here, the current job name and number will be used:
@@ -38,7 +38,7 @@ pipeline {
       }
     }
 
-    stage('Publish Build Info') {
+    stage('ビルドインフォのプッシュ') {
       steps {
         rtPublishBuildInfo(
           serverId: 'yokota',
@@ -47,7 +47,7 @@ pipeline {
       }
     }
 
-    stage('Xray Scan') {
+    stage('Xrayスキャン') {
       steps {
         xrayScan(
           serverId: 'yokota',
@@ -57,7 +57,7 @@ pipeline {
       }
     }
 
-    stage('Release') {
+    stage('リリース') {
       steps {
         rtDownload(
           serverId: 'yokota',
