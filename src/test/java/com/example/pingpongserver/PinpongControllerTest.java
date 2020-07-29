@@ -22,7 +22,7 @@ public class PinpongControllerTest {
     @Test
     void returnStatus200() throws Exception {
         this.mockMvc.perform(post("/pingpong")
-                .content("やっほー")
+                .content("hello")
                 .contentType(MediaType.TEXT_PLAIN)
                 .accept(MediaType.TEXT_PLAIN))
                 .andExpect(status().isOk());
@@ -31,10 +31,10 @@ public class PinpongControllerTest {
     @Test
     void returnRequestedText() throws Exception {
         this.mockMvc.perform(post("/pingpong")
-                .content("やっほー")
+                .content("hello")
                 .contentType(MediaType.TEXT_PLAIN)
                 .accept(MediaType.TEXT_PLAIN))
-                .andExpect(content().string(matchesPattern("やっほー")));
+                .andExpect(content().string(matchesPattern("hello")));
     }
 }
 
