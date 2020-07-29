@@ -33,6 +33,11 @@ publishing {
 
 test {
     useJUnitPlatform()
+        //we want display the following test events
+    testLogging {
+        events "PASSED", "STARTED", "FAILED", "SKIPPED"
+        exceptionFormat "full"
+    }
 }
 
 jar.enabled = true
