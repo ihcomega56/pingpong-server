@@ -5,7 +5,7 @@ pipeline {
       steps {
         git branch: 'master',
           credentialsId: 'github',
-          url: 'git@github.com:ihcomega56/pingpong-server.git'
+          url: 'https://github.com/ihcomega56/pingpong-server.git'
       }
     }
 
