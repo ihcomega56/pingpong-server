@@ -7,7 +7,7 @@ public class PingpongController {
 
     @RequestMapping("/pingpong")
     public String index(@RequestBody String body) {
-        return body;
+        return body + body;
     }
 
 }
