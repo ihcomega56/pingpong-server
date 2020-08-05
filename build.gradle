@@ -26,7 +26,6 @@ publishing {
             pom {
                 url = artifactory_url
             }
-            artifact bootJar
         }
     }
 }
