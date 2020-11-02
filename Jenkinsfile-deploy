@@ -1,0 +1,70 @@
+def targetVersion
+
+node {
+    stage('リリースするバージョンの選択') {
+      targetVersion = input(
+            id: 'targetVersion',
+            message: 'リリースするバージョンを入力して下さい',
+            parameters: [
+                [$class: 'ChoiceParameterDefinition',
+                name: 'targetVersion',
+                choices: '1.0.0\n1.1.0',
+                description: 'リリースするバージョン']
+          ])
+    }
+
+    stage('メタデータの更新') {
+        def deletePropsSpec = '''{
+          "files": [
+            {
+              "aql": {"items.find":{"name":{"$match":"pingpong-server*.jar"},"$and":[{"@current":"true"}]}}
+            }
+          ]
+        }'''
+        def setPropsSpec = '''{
+          "files": [
+            {
+              "aql": {"items.find":{"name":{"$match":"pingpong-server*.jar"},"$and":[{"@version":"1.0.0"}]}}
+            }
+          ]
+        }'''
+        def server = Artifactory.server 'yokota'
+        rtDeleteProps(
+          serverId: 'yokota',
+          failNoOp: true,
+          props: "current",
+          spec: deletePropsSpec
+        )
+        rtSetProps(
+          serverId: 'yokota',
+          failNoOp: false,
+          props: "released=true;current=true",
+          spec: setPropsSpec
+        )
+    }
+
+    stage('リリース') {
+        rtDownload(
+          serverId: 'yokota',
+          buildName: 'pingpong-server',
+          failNoOp: false,
+          spec: '''{
+          "files": [
+            {
+              "aql": {"items.find":{"name":{"$match":"pingpong-server*.jar"},"$and":[{"@version":"1.0.0"}]}}
+            }
+          ]
+          }''',
+        )
+        pushToCloudFoundry(
+          target: 'https://api.us-south.cf.cloud.ibm.com',
+          organization: "$email",
+          cloudSpace: 'dev',
+          credentialsId: 'ibmcloud',
+          manifestChoice: [appName: 'pingpong-server',
+                           appPath: "com/example/pingpong-server/${targetVersion}-SNAPSHOT/pingpong-server-${targetVersion}-SNAPSHOT.jar",
+                           value: "jenkinsConfig"],
+          pluginTimeout: "600"
+        )
+    }
+}

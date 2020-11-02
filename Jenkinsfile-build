@@ -1,19 +1,26 @@
-pipeline {
-  agent any
-  stages {
+def targetVersion
+
+node {
+    stage('リリースバージョンの入力') {
+        targetVersion = input(
+            id: 'userInput',
+            message: '作成するバージョンを入力して下さい',
+            parameters: [
+                [$class: 'TextParameterDefinition',
+                name: 'targetVersion',
+                description: '作成するバージョン']
+        ])
+    }
+
     stage('Gitクローン') {
-      steps {
         git branch: 'master',
-          credentialsId: 'github',
-          url: 'https://github.com/ihcomega56/pingpong-server.git'
-      }
+        credentialsId: 'github',
+        url: 'https://github.com/ihcomega56/pingpong-server.git'
     }
 
     stage('ビルド, テスト, アーティファクトのプッシュ') {
 
-      steps {
-        rtGradleResolver(
-          id: 'pingpong-resolver',
+        rtGradleResolver(id: 'pingpong-resolver',
           serverId: 'yokota',
           repo: 'jcenter'
         )
@@ -35,53 +42,32 @@ pipeline {
           // If the build name and build number are not set here, the current job name and number will be used:
           buildName: 'pingpong-server'
         )
-      }
     }
 
     stage('ビルドインフォのプッシュ') {
-      steps {
         rtPublishBuildInfo(
           serverId: 'yokota',
           buildName: 'pingpong-server'
         )
-      }
+    }
+
+    stage('メタデータの付与') {
+        def setPropsSpec = '''{
+          "files": [
+            {
+              "aql": {"items.find":{"name":{"$match":"pingpong-server-${targetVersion}.jar"}}}
+            }
+          ]
+        }'''
+        def server = Artifactory.server 'yokota'
+        server.setProps spec: setPropsSpec, props: "version=${targetVersion}"
     }
 
     stage('Xrayスキャン') {
-      steps {
         xrayScan(
           serverId: 'yokota',
           buildName: 'pingpong-server',
           failBuild: true
         )
-      }
-    }
-
-    stage('リリース') {
-      steps {
-        rtDownload(
-          serverId: 'yokota',
-          buildName: 'pingpong-server',
-          failNoOp: true,
-          spec: '''{
-          "files": [
-            {
-              "pattern": "pingpong-local/com/example/pingpong-server/0.0.1-SNAPSHOT/pingpong-server-0.0.1-SNAPSHOT.jar"
-            }
-          ]
-          }''',
-        )
-        pushToCloudFoundry(
-          target: 'https://api.us-south.cf.cloud.ibm.com',
-          organization: "$email",
-          cloudSpace: 'dev',
-          credentialsId: 'ibmcloud',
-          manifestChoice: [appName: 'pingpong-server',
-                           appPath: "com/example/pingpong-server/0.0.1-SNAPSHOT/pingpong-server-0.0.1-SNAPSHOT.jar",
-                           value: "jenkinsConfig"],
-          pluginTimeout: "600"
-        )
-      }
-    }
   }
 }
