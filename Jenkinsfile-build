@@ -52,13 +52,9 @@ node {
     }
 
     stage('メタデータの付与') {
-        def setPropsSpec = '''{
-          "files": [
-            {
-              "aql": {"items.find":{"name":{"$match":"pingpong-server-${targetVersion}.jar"}}}
-            }
-          ]
-        }'''
+        def setPropsSpec = "{\"files\": [{\"aql\": {\"items.find\":{\"name\":{\"\$match\":\"pingpong-server-" \
+            + "${targetVersion}" \
+            + "*.jar\"}}}}]}"
         def server = Artifactory.server 'yokota'
         server.setProps spec: setPropsSpec, props: "version=${targetVersion}"
     }

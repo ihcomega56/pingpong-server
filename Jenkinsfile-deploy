@@ -21,13 +21,8 @@ node {
             }
           ]
         }'''
-        def setPropsSpec = '''{
-          "files": [
-            {
-              "aql": {"items.find":{"name":{"$match":"pingpong-server*.jar"},"$and":[{"@version":"1.0.0"}]}}
-            }
-          ]
-        }'''
+        def setPropsSpec = "{\"files\": [{\"aql\": {\"items.find\":{\"name\":{\"\$match\":\"pingpong-server-*.jar\"}," \
+            + "\"\$and\":[{\"@version\":\"${targetVersion}\"}]}}}]}"
         def server = Artifactory.server 'yokota'
         rtDeleteProps(
           serverId: 'yokota',
