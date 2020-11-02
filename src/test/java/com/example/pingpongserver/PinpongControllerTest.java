@@ -34,7 +34,7 @@ public class PinpongControllerTest {
                 .content("hello")
                 .contentType(MediaType.TEXT_PLAIN)
                 .accept(MediaType.TEXT_PLAIN))
-                .andExpect(content().string(matchesPattern("hellohello")));
+                .andExpect(content().string(matchesPattern("hello")));
     }
 }
 
