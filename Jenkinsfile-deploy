@@ -45,17 +45,13 @@ node {
     }
 
     stage('リリース') {
+        def setPropsSpec = "{\"files\": [{\"aql\": {\"items.find\":{\"name\":{\"\$match\":\"pingpong-server-*.war\"}," \
+            + "\"\$and\":[{\"@version\":\"${targetVersion}\"}]}}}]}"
         rtDownload(
           serverId: 'yokota',
           buildName: 'pingpong-server',
           failNoOp: false,
-          spec: '''{
-          "files": [
-            {
-              "aql": {"items.find":{"name":{"$match":"pingpong-server*.war"},"$and":[{"@version":"1.0.0"}]}}
-            }
-          ]
-          }''',
+          spec: spec
         )
         pushToCloudFoundry(
           target: 'https://api.us-south.cf.cloud.ibm.com',
