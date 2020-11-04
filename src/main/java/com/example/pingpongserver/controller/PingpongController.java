@@ -7,7 +7,7 @@ public class PingpongController {
 
     @RequestMapping("/version")
     public String index() {
-        return "現在のバージョンは0.1.0です"; // TODO: 設定ファイルから取る
+        return "現在のバージョンは1.0.0です"; // TODO: 設定ファイルから取る
     }
 
     @RequestMapping("/pingpong")
