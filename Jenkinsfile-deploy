@@ -17,19 +17,25 @@ node {
         def deletePropsSpec = '''{
           "files": [
             {
-              "aql": {"items.find":{"name":{"$match":"pingpong-server*.jar"},"$and":[{"@current":"true"}]}}
+              "aql": {"items.find":{"name":{"$match":"pingpong-server*.war"},"$and":[{"@current":"true"}]}}
             }
           ]
         }'''
-        def setPropsSpec = "{\"files\": [{\"aql\": {\"items.find\":{\"name\":{\"\$match\":\"pingpong-server-*.jar\"}," \
+        def setPropsSpec = "{\"files\": [{\"aql\": {\"items.find\":{\"name\":{\"\$match\":\"pingpong-server-*.war\"}," \
             + "\"\$and\":[{\"@version\":\"${targetVersion}\"}]}}}]}"
         def server = Artifactory.server 'yokota'
-        rtDeleteProps(
-          serverId: 'yokota',
-          failNoOp: true,
-          props: "current",
-          spec: deletePropsSpec
-        )
+
+        try {
+          rtDeleteProps(
+            serverId: 'yokota',
+            failNoOp: true,
+            props: "current",
+            spec: deletePropsSpec
+          )
+        } catch (Exception e) {
+          print "No artifact to be updated"
+        }
+
         rtSetProps(
           serverId: 'yokota',
           failNoOp: false,
@@ -46,7 +52,7 @@ node {
           spec: '''{
           "files": [
             {
-              "aql": {"items.find":{"name":{"$match":"pingpong-server*.jar"},"$and":[{"@version":"1.0.0"}]}}
+              "aql": {"items.find":{"name":{"$match":"pingpong-server*.war"},"$and":[{"@version":"1.0.0"}]}}
             }
           ]
           }''',
@@ -57,7 +63,7 @@ node {
           cloudSpace: 'dev',
           credentialsId: 'ibmcloud',
           manifestChoice: [appName: 'pingpong-server',
-                           appPath: "com/example/pingpong-server/${targetVersion}-SNAPSHOT/pingpong-server-${targetVersion}-SNAPSHOT.jar",
+                           appPath: "com/example/pingpong-server/${targetVersion}-SNAPSHOT/pingpong-server-${targetVersion}-SNAPSHOT.war",
                            value: "jenkinsConfig"],
           pluginTimeout: "600"
         )

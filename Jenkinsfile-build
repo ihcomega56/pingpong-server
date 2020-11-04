@@ -13,7 +13,7 @@ node {
     }
 
     stage('Gitクローン') {
-        git branch: 'master',
+        git branch: "$targetVersion",
         credentialsId: 'github',
         url: 'https://github.com/ihcomega56/pingpong-server.git'
     }
@@ -54,7 +54,7 @@ node {
     stage('メタデータの付与') {
         def setPropsSpec = "{\"files\": [{\"aql\": {\"items.find\":{\"name\":{\"\$match\":\"pingpong-server-" \
             + "${targetVersion}" \
-            + "*.jar\"}}}}]}"
+            + "*.war\"}}}}]}"
         def server = Artifactory.server 'yokota'
         server.setProps spec: setPropsSpec, props: "version=${targetVersion}"
     }
