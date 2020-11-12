@@ -30,7 +30,7 @@ node {
           manifestChoice: [appName: 'pingpong-server',
                            appPath: "com/example/pingpong-server/${targetVersion}-SNAPSHOT/pingpong-server-${targetVersion}-SNAPSHOT.war",
                            value: "jenkinsConfig"],
-          pluginTimeout: "600"
+          pluginTimeout: "180"
         )
     }
 
