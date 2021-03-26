@@ -21,16 +21,16 @@ dependencies {
     }
 }
 
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            pom {
-                url = artifactory_url
-            }
-            artifact bootWar
-        }
-    }
-}
+//publishing {
+//    publications {
+//        mavenJava(MavenPublication) {
+//            pom {
+//                url = artifactory_url
+//            }
+//            artifact bootWar
+//        }
+//    }
+//}
 
 test {
     useJUnitPlatform()
